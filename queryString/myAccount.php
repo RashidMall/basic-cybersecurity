@@ -22,77 +22,77 @@
         <h1>Transactions</h1>
         <table class="table table-bordered">
             <thead>
-            <tr>
-                <td> transaction Key </td>
-                <td> from </td>
-                <td> To</td>
-                <td> Amount</td>
-            </tr>
+                <tr>
+                    <td scope="col"> Transaction Key </td>
+                    <td scope="col"> From </td>
+                    <td scope="col"> To</td>
+                    <td scope="col"> Amount</td>
+                </tr>
             </thead>
             <tbody>
 
-            <?php
-            require("../includes/dbinfo.inc");
+                <?php
+                require("../includes/dbinfo.inc");
 
-            // Connect to db
-            $connect = mysqli_connect($hostDB, $userDB, $passwordDB, $databaseDB);
-            if(mysqli_connect_errno()){
-                die("Failed to connect to the database ". mysqli_connect_error());
-            }
-
-            $userToken = $_GET['userToken'];
-
-            // Get user name from token
-            $query = "SELECT userName FROM login WHERE userToken='$userToken'";
-            $result = mysqli_query($connect,$query);
-            if (!$result){
-                die('Error cannot execute a query');
-            }
-
-            $userName = null;
-            while ($row = mysqli_fetch_assoc($result)) {
-            $userName = $row["userName"];
-            break;
-            }
-
-            // Add new transaction
-            if(!empty($userName) && !empty($_POST['ToUserName'])) {
-
-                $query ="INSERT INTO activities(fromUserName, ToUserName, Amount)
-                    VALUES ('".$userName ."','".$_POST['ToUserName'] ."',".$_POST['Amount'] .")";
-
-                $result= mysqli_query($connect,$query);
-                if (!$result){
-                    die('Error cannot execute a query');
+                // Connect to db
+                $connect = mysqli_connect($hostDB, $userDB, $passwordDB, $databaseDB);
+                if(mysqli_connect_errno()){
+                    die("Failed to connect to the database ". mysqli_connect_error());
                 }
-            }
 
-            // Get user transactions
-            if( !empty($userName)) {
-                $query ="SELECT * FROM activities  WHERE fromUserName = '$userName' OR ToUserName = '$userName'" ;
-                $result= mysqli_query($connect,$query);
+                $userToken = $_GET['userToken'];
+
+                // Get user name from token
+                $query = "SELECT userName FROM login WHERE userToken='$userToken'";
+                $result = mysqli_query($connect,$query);
                 if (!$result){
                     die('Error cannot execute a query');
                 }
 
-                $userInfo=array();
-                $loginInUser=null;
-                while ($row= mysqli_fetch_assoc($result)) {
-                    $rowColor ="class='success'";
-                    if($row["fromUserName"]==$userName){
-                        $rowColor ="class='danger'";
+                $userName = null;
+                while ($row = mysqli_fetch_assoc($result)) {
+                $userName = $row["userName"];
+                break;
+                }
+
+                // Add new transaction
+                if(!empty($userName) && !empty($_POST['ToUserName'])) {
+
+                    $query ="INSERT INTO activities(fromUserName, ToUserName, Amount)
+                        VALUES ('".$userName ."','".$_POST['ToUserName'] ."',".$_POST['Amount'] .")";
+
+                    $result= mysqli_query($connect,$query);
+                    if (!$result){
+                        die('Error cannot execute a query');
                     }
-                    echo " <tr $rowColor>";
-                    echo " <td>". $row["transactionKey"] ." </td>";
-                    echo " <td>". $row["fromUserName"] ." </td>";
-                    echo "  <td>". $row["ToUserName"]."</td>";
-                    echo " <td>". $row["Amount"]."</td>";
-                    echo " </tr>";
                 }
-                mysqli_free_result($result);
-            }
-            mysqli_close($connect);
-            ?>
+
+                // Get user transactions
+                if( !empty($userName)) {
+                    $query ="SELECT * FROM activities  WHERE fromUserName = '$userName' OR ToUserName = '$userName'" ;
+                    $result= mysqli_query($connect,$query);
+                    if (!$result){
+                        die('Error cannot execute a query');
+                    }
+
+                    $userInfo=array();
+                    $loginInUser=null;
+                    while ($row= mysqli_fetch_assoc($result)) {
+                        $rowColor ="class='table-success'";
+                        if($row["fromUserName"]==$userName){
+                            $rowColor ="class='table-danger'";
+                        }
+                        echo "<tr $rowColor>";
+                        echo "<td>". $row["transactionKey"] ."</td>";
+                        echo "<td>". $row["fromUserName"] ."</td>";
+                        echo "<td>". $row["ToUserName"]."</td>";
+                        echo "<td>". $row["Amount"]."</td>";
+                        echo "</tr>";
+                    }
+                    mysqli_free_result($result);
+                }
+                mysqli_close($connect);
+                ?>
             </tbody>
         </table>
     </div>
